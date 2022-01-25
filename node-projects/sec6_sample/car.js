@@ -6,6 +6,6 @@ var Car = class {
 	drive() {
 		console.log(("zoom zoom ..."));
 	}
-}
+};
 
 module.exports = Car;
