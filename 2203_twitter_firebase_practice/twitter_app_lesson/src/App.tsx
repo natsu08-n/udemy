@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import styles from "./App.module.css";
 import { useSelector, useDispatch } from "react-redux";
 import { selectUser, login, logout } from "./features/userSlice";
-import { auth } from "./firebase";
+import { auth, provider } from "./firebase";
 import Feed from "./components/Feed";
 import Auth from "./components/Auth";
 import { StylesContext } from "@material-ui/styles";
@@ -10,6 +10,9 @@ import { StylesContext } from "@material-ui/styles";
 const App: React.FC = () => {
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
+	const signInGoogle = async () => {
+		await auth.signInWithPopup(provider).catch((err) => alert(err.message));
+	}
 
   useEffect(() => {
     const unSub = auth.onAuthStateChanged((authUser) => {
@@ -30,17 +33,19 @@ const App: React.FC = () => {
     });
     return () => {
       unSub();
-    }
+    };
   }, [dispatch]);
-  return <>
-  {user.uid ? (
-    <div className={styles.app}><Feed /></div>
-    
-  ) : (
-    <Auth />
-  )
-}
-  </>;
+  return (
+    <>
+      {user.uid ? (
+        <div className={styles.app}>
+          <Feed />
+        </div>
+      ) : (
+        <Auth />
+      )}
+    </>
+  );
 };
 
 export default App;
