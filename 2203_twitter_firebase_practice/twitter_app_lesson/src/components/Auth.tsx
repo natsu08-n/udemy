@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./Auth.module.css";
 import { useDispatch } from "react-redux";
+import { updateUserProfile } from "../features/userSlice";
 import { auth, provider, storage } from "../firebase";
 
 import {
@@ -60,16 +61,55 @@ const useStyles = makeStyles((theme) => ({
 
 const Auth: React.FC = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [avatarImage, setAvatarImage] = useState<File | null>(null); //取りうる型を｜のユニオン型で定義
   const [isLogin, setIsLogin] = useState(true);
+
+  const onChangeImageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files![0]) {
+      //!はnonnulltypeアサーション
+      setAvatarImage(e.target.files![0]);
+      e.target.value = ""; //htmlのファイルダイアログを毎回同じものを指定したときに毎回反応しない仕様、そのため毎回空の文字列で初期化する必要がある
+    }
+  };
 
   const signInEmail = async () => {
     await auth.signInWithEmailAndPassword(email, password);
   };
+
   const signUpEmail = async () => {
-    await auth.createUserWithEmailAndPassword(email, password);
+    const authUser = await auth.createUserWithEmailAndPassword(email, password);
+    let url = "";
+    if (avatarImage) {
+      const S =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUCVWXYZ0123456789";
+      const N = 16;
+      const randomeChar = Array.from(crypto.getRandomValues(new Uint32Array(N))) //Crypto.getRandomValues() メソッドは、暗号強度の強い乱数値を取得する
+        .map((n) => S[n % S.length])
+        .join("");
+
+      const fileName = randomeChar + "_" + avatarImage.name;
+
+      await storage.ref(`avatars/${fileName}`).put(avatarImage);
+      url = await storage.ref("avatars").child(fileName).getDownloadURL();
+      //firebaseの仕様で、同じファイル名の画像を複数回アップロードすると元々あったファイルが削除されてしまう
+      //そのため、自動でランダムなファイル名を作っていく必要がある
+    }
+    await authUser.user?.updateProfile({
+      displayName: username,
+      photoURL: url,
+    });
+    dispatch(
+      updateUserProfile({
+        displayName: username,
+        photoUrl: url,
+      })
+    )
   };
+
   const signInGoogle = async () => {
     await auth.signInWithPopup(provider).catch((err) => alert(err.message));
   };
@@ -125,20 +165,20 @@ const Auth: React.FC = () => {
               startIcon={<EmailIcon />}
               onClick={
                 isLogin
-                ? async () => {
-                  try {
-                    await signInEmail();
-                  } catch (err : any) {
-                    alert(err.message);
-                  }
-                }
-                : async () => {
-                  try {
-                    await signUpEmail();
-                  } catch (err : any) {
-                    alert(err.message);
-                  }
-                }
+                  ? async () => {
+                      try {
+                        await signInEmail();
+                      } catch (err: any) {
+                        alert(err.message);
+                      }
+                    }
+                  : async () => {
+                      try {
+                        await signUpEmail();
+                      } catch (err: any) {
+                        alert(err.message);
+                      }
+                    }
               }
             >
               {isLogin ? "Login" : "Register"}
@@ -147,10 +187,11 @@ const Auth: React.FC = () => {
               <Grid item xs>
                 <span className={styles.login_reset}>Forgot password?</span>
               </Grid>
-              <Grid item xs>
-                <span 
-                className={styles.login_toggleMode}
-                onClick={() => setIsLogin(!isLogin)}>
+              <Grid item>
+                <span
+                  className={styles.login_toggleMode}
+                  onClick={() => setIsLogin(!isLogin)}
+                >
                   {isLogin ? "Create new account ? " : "Back to login"}
                 </span>
               </Grid>
