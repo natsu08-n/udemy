@@ -12,13 +12,17 @@ export const TaskCard = () => {
 			<TaskCardTitle />
 			<TaskCardDeleteButton />
 			<TaskAddInput
-				//props名={値}でpropsを渡す
+				//props名={値}でpropsを渡す, TaskAddInputはpropsを受け取っていろいろやる
 				inputText={inputText}
 				setInputText={setInputText}
 				taskList={taskList}
 				setTaskList={setTaskList}
 			/>
-			<Tasks />
+			<Tasks
+				//props名={値}でpropsを渡す, Tasksもpropsを受け取っていろいろやる
+				inputText={inputText}
+				taskList={taskList}
+			/>
 		</div>
 	);
 };
