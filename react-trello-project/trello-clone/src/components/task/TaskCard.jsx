@@ -22,6 +22,7 @@ export const TaskCard = () => {
 				//props名={値}でpropsを渡す, Tasksもpropsを受け取っていろいろやる
 				inputText={inputText}
 				taskList={taskList}
+				setTaskList={setTaskList}
 			/>
 		</div>
 	);

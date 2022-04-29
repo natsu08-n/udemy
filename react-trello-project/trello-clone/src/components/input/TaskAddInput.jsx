@@ -8,9 +8,12 @@ export const TaskAddInput = ({
 }) => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
+		if (inputText === '') {
+			return;
+		}
 		//カードを追加する
 		//setTaskListでは第二引数がtaskListにどんどん入っていく(スプレッド構文なので展開されていく)
-		setTaskList([...taskList, { text: inputText }]);
+		setTaskList([...taskList, { id: taskList.length, text: inputText }]);
 		setInputText(''); //タスクを追加したらテキスト中身をまた空にする
 	};
 
