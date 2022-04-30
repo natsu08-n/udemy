@@ -13,7 +13,14 @@ export const TaskAddInput = ({
 		}
 		//カードを追加する
 		//setTaskListでは第二引数がtaskListにどんどん入っていく(スプレッド構文なので展開されていく)
-		setTaskList([...taskList, { id: taskList.length, text: inputText }]);
+		setTaskList([
+			...taskList,
+			{
+				id: taskList.length,
+				text: inputText,
+				draggableId: `task-${taskList.length}`,
+			},
+		]);
 		setInputText(''); //タスクを追加したらテキスト中身をまた空にする
 	};
 
