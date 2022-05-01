@@ -1,5 +1,9 @@
-import React from 'react'
+import React from 'react';
 
 export const AddTaskCardButton = () => {
-	return <div></div>
-}
+	return (
+		<div className="addTaskCardButtonArea">
+			<button className="addTaskCardButton">+</button>
+		</div>
+	);
+};
