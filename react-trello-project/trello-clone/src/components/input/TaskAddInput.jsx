@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuid } from 'uuid';
 
 export const TaskAddInput = ({
 	inputText,
@@ -7,6 +8,7 @@ export const TaskAddInput = ({
 	setTaskList,
 }) => {
 	const handleSubmit = (e) => {
+		const taskId = uuid();
 		e.preventDefault();
 		if (inputText === '') {
 			return;
@@ -16,9 +18,9 @@ export const TaskAddInput = ({
 		setTaskList([
 			...taskList,
 			{
-				id: taskList.length,
+				id: taskId,
 				text: inputText,
-				draggableId: `task-${taskList.length}`,
+				draggableId: `task-${taskId}`,
 			},
 		]);
 		setInputText(''); //タスクを追加したらテキスト中身をまた空にする
