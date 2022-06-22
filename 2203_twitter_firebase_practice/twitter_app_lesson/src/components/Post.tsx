@@ -10,6 +10,7 @@ import MessageIcon from "@material-ui/icons/Message";
 import SendIcon from "@material-ui/icons/Send";
 import { StylesContext } from "@material-ui/styles";
 import { StyleSharp } from "@material-ui/icons";
+import { userInfo } from "os";
 
 //propsでFeedコンポーネントからfirebaseのデータを受け取る、そのときにTS使うならデータ型を定義しておく必要がある
 interface PROPS {
@@ -22,6 +23,21 @@ interface PROPS {
 }
 
 const Post: React.FC<PROPS> = (props) => {
+	const user = useSelector(selectUser); //reduxからuserデータ取ってくる
+	const [comment, setComment] = useState("");
+	const newComment = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault(); //あとで送信で実行されるようにするので、リフレッシュを防ぐためにつける
+
+		//db.collection("post")でpostの名称データにアクセスしてpostIdが該当のやつだよ、ってする。
+		//
+		db.collection("posts").doc(props.postId).collection("comments").add({
+			avatar: user.photoUrl,
+			text: comment,
+			timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+			username: user.displayName,
+		});
+		setComment(""); //コメントしたあとは空の""で初期化
+	};
 	return (
 		<div className={styles.post}>
 			<div className={styles.post_avatar}>
@@ -46,6 +62,28 @@ const Post: React.FC<PROPS> = (props) => {
 						<img src={props.image} alt="tweet" />
 					</div>
 				)}
+				<form onSubmit={newComment}>
+					<div className={styles.post_form}>
+						<input
+							type="text"
+							className={styles.post_input}
+							placeholder="Type new comment..."
+							value={comment}
+							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+								setComment(e.target.value);
+							}}
+						/>
+						<button
+							disabled={!comment}
+							className={
+								comment ? styles.post_button : styles.post_buttonDisable
+							}
+							type="submit"
+						>
+							<SendIcon className={styles.post_sendIcon} />
+						</button>
+					</div>
+				</form>
 			</div>
 		</div>
 	);

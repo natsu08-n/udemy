@@ -39,6 +39,7 @@ const Feed: React.FC = () => {
 		};
 	}, []);
 	return (
+		//投稿がない時はレンダリングしない(idが存在したら&&の後ろがレンダリングされる)
 		<div className={styles.feed}>
 			<TweetInput />
 			{posts[0]?.id && (
