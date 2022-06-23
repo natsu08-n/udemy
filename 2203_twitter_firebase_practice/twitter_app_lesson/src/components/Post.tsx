@@ -22,9 +22,61 @@ interface PROPS {
 	username: string;
 }
 
+interface COMMENT {
+	id: string;
+	avatar: string;
+	text: string;
+	timestamp: any;
+	username: string;
+}
+
+const useStyles = makeStyles((theme) => ({
+	small: {
+		width: theme.spacing(3),
+		height: theme.spacing(3),
+		marginRight: theme.spacing(1),
+	},
+}));
+
 const Post: React.FC<PROPS> = (props) => {
+	const classes = useStyles();
 	const user = useSelector(selectUser); //reduxからuserデータ取ってくる
 	const [comment, setComment] = useState("");
+	const [comments, setComments] = useState<COMMENT[]>([
+		{
+			id: "",
+			avatar: "",
+			text: "",
+			username: "",
+			timestamp: null,
+		},
+	]);
+
+	const [openComments, setOpenComments] = useState(false);
+
+	//firestoreからコメントを取得する
+	useEffect(() => {
+		const unsub = db
+			.collection("posts")
+			.doc(props.postId)
+			.collection("comments")
+			.orderBy("timestamp", "desc")
+			.onSnapshot((snapshot) => {
+				setComments(
+					snapshot.docs.map((doc) => ({
+						id: doc.id,
+						avatar: doc.data().avatar,
+						text: doc.data().text,
+						username: doc.data().username,
+						timestamp: doc.data().timestamp,
+					}))
+				);
+			});
+		return () => {
+			unsub(); //アンマウントされたときのクリーンアップ関数
+		};
+	}, [props.postId]); // idが変わったら再度firestoreからデータを取ってくる
+
 	const newComment = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault(); //あとで送信で実行されるようにするので、リフレッシュを防ぐためにつける
 
@@ -57,33 +109,56 @@ const Post: React.FC<PROPS> = (props) => {
 						<p>{props.text}</p>
 					</div>
 				</div>
+
 				{props.image && (
 					<div className={styles.post_tweetImage}>
 						<img src={props.image} alt="tweet" />
 					</div>
 				)}
-				<form onSubmit={newComment}>
-					<div className={styles.post_form}>
-						<input
-							type="text"
-							className={styles.post_input}
-							placeholder="Type new comment..."
-							value={comment}
-							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-								setComment(e.target.value);
-							}}
-						/>
-						<button
-							disabled={!comment}
-							className={
-								comment ? styles.post_button : styles.post_buttonDisable
-							}
-							type="submit"
-						>
-							<SendIcon className={styles.post_sendIcon} />
-						</button>
-					</div>
-				</form>
+
+				<MessageIcon
+					className={styles.post_commmentIcon}
+					onClick={() => setOpenComments(!openComments)}
+				/>
+
+				{openComments && (
+					<>
+						{comments.map((com) => (
+							<div key={com.id} className={styles.post_comment}>
+								<Avatar src={com.avatar} className={classes.small} />
+
+								<span className={styles.post_commentUser}>@{com.username}</span>
+								<span className={styles.post_commentText}>{com.text}</span>
+								<span className={styles.post_headerTime}>
+									{new Date(com.timestamp?.toDate()).toLocaleString()}
+								</span>
+							</div>
+						))}
+
+						<form onSubmit={newComment}>
+							<div className={styles.post_form}>
+								<input
+									type="text"
+									className={styles.post_input}
+									placeholder="Type new comment..."
+									value={comment}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+										setComment(e.target.value);
+									}}
+								/>
+								<button
+									disabled={!comment}
+									className={
+										comment ? styles.post_button : styles.post_buttonDisable
+									}
+									type="submit"
+								>
+									<SendIcon className={styles.post_sendIcon} />
+								</button>
+							</div>
+						</form>
+					</>
+				)}
 			</div>
 		</div>
 	);
