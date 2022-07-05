@@ -24,30 +24,25 @@ function isValidEmail(email) {
 	return re.test(String(email).toLowerCase()); //マッチすればtrueを返す、小文字に変換
 }
 
+//Check required fields
+function checkRequired(inputArr) {
+	inputArr.forEach(function (input) {
+		if (input.value.trim() === "") {
+			showError(input, `${getFieldName(input)} is required`);
+		} else {
+			showSuccess(input);
+		}
+	});
+}
+
+//Get fieldName
+function getFieldName(input) {
+	//テキストの最初の文字だけ大文字にしたい場合、charAtとtoUpperCaseとsliceを組み合わせる
+	return input.id.charAt(0).toUpperCase() + input.id.slice(1);
+}
+
 form.addEventListener("submit", function (e) {
 	e.preventDefault();
 
-	if (username.value === "") {
-		showError(username, "Username is required");
-	} else {
-		showSuccess(username);
-	}
-
-	if (email.value === "") {
-		showError(email, "Email is required");
-	} else {
-		showSuccess(email);
-	}
-
-	if (password.value === "") {
-		showError(password, "password is required");
-	} else {
-		showSuccess(password);
-	}
-
-	if (password2.value === "") {
-		showError(password2, "password2 is required");
-	} else {
-		showSuccess(password2);
-	}
+	checkRequired([username, email, password, password2]);
 });
