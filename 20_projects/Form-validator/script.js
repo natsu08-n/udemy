@@ -9,19 +9,25 @@ function showError(input, message) {
 	formControl.className = "form-control error"; //クラス名を上書き
 	const small = formControl.querySelector("small"); //smallタグ
 	small.innerText = message;
-	console.log(formControl);
 }
 
 function showSuccess(input) {
 	const formControl = input.parentElement;
 	formControl.className = "form-control success";
-	console.log(formControl);
 }
 
-function isValidEmail(email) {
+function checkEmail(input) {
 	const re =
-		/^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-	return re.test(String(email).toLowerCase()); //マッチすればtrueを返す、小文字に変換
+		/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	//return re.test(String(email).toLowerCase()); //マッチすればtrueを返す、小文字に変換
+
+	//正規表現でチェック
+	if (re.test(input.value.trim())) {
+		//input欄に入力された値が先頭半角入っていても大丈夫なように
+		showSuccess(input);
+	} else {
+		showError(input, `Email is not valid`);
+	}
 }
 
 //Check required fields
@@ -34,6 +40,29 @@ function checkRequired(inputArr) {
 		}
 	});
 }
+//check input length
+function checkLength(input, min, max) {
+	if (input.value.length < min) {
+		showError(
+			input,
+			`${getFieldName(input)} must be at least ${min} characters`
+		);
+	} else if (input.value.length > max) {
+		showError(
+			input,
+			`${getFieldName(input)} must be less than ${max} characters`
+		);
+	} else {
+		showSuccess(input);
+	}
+}
+
+//Check passwords match
+function checkPasswordsMatch(input1, input2) {
+	if (input1.value != input2.value) {
+		showError(input2, "Passwords do not match");
+	}
+}
 
 //Get fieldName
 function getFieldName(input) {
@@ -45,4 +74,8 @@ form.addEventListener("submit", function (e) {
 	e.preventDefault();
 
 	checkRequired([username, email, password, password2]);
+	checkLength(username, 3, 15);
+	checkLength(password, 6, 25);
+	checkEmail(email);
+	checkPasswordsMatch(password, password2);
 });
