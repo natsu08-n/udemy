@@ -1,0 +1,33 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato&family=Open+Sans&display=swap");
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	background-color: #242333;
+	color: #fff;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh; /*ビューポート（画面サイズ）の高さに対する割合。*/
+	font-family: "Lato", sans-serif;
+	margin: 0;
+}
+
+.movie-container {
+	margin: 20px 0;
+}
+.movie-container select {
+	background-color: #fff;
+	border: 0;
+	border-radius: 5px;
+	font-size: 14px;
+	margin-left: 10px;
+	padding: 5px 15px 5px 15px;
+	/* appearance: none; でブラウザ別に設定されているデフォルトスタイルを無効にできます。 */
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+}
