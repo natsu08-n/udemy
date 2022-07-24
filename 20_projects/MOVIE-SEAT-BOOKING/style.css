@@ -31,3 +31,88 @@ body {
 	-moz-appearance: none;
 	appearance: none;
 }
+
+/*親要素自身に奥行きを持たせたいときにperspectiveを使う。数値が大きいと遠近が小さい。子要素にはtransformをつけている必要がある。*/
+.container {
+	perspective: 1000px;
+	margin-bottom: 30px;
+}
+
+.seat {
+	background-color: #444451;
+	height: 12px;
+	width: 15px;
+	margin: 3px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+.seat.selected {
+	background-color: #6feaf6;
+}
+
+.seat.occupied {
+	background-color: #fff;
+}
+
+/*同じ階層の同じ要素の2番目*/
+.seat:nth-of-type(2) {
+	margin-right: 18px;
+}
+
+.seat:nth-last-of-type(2) {
+	margin-left: 18px;
+}
+
+/*:not(.除外したいクラス名)とすることで、このクラスだけ対象から外す、ということができる*/
+.seat:not(.occupied):hover {
+	cursor: pointer;
+	transform: scale(1.2);
+}
+
+.showcase .seat:not(.occupied):hover {
+	cursor: default;
+	transform: scale(1);
+}
+
+.showcase {
+	background: rgba(0, 0, 0, 0.1);
+	padding: 5px 10px;
+	border-radius: 5px;
+	color: #777;
+	list-style-type: none;
+	display: flex;
+	justify-content: space-between;
+}
+.showcase li {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 10px;
+}
+
+.showcase li small {
+	margin-left: 2px;
+}
+
+.row {
+	display: flex;
+}
+
+.screen {
+	background-color: #fff;
+	height: 70px;
+	width: 100%;
+	margin: 15px 0;
+	/*水平線を軸にくるくる回転している、ので-45degだと回転途中で上下が狭まって見える*/
+	transform: rotateX(-45deg);
+	box-shadow: 0 3px 10px rgba(255, 255, 255, 0.7);
+}
+
+p.text {
+	margin: 5px 0;
+}
+
+p.text span {
+	color: #6feaf6;
+}
