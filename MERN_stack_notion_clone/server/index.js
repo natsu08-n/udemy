@@ -30,7 +30,7 @@ app.post(
   body("confirmPassword")
     .isLength({ min: 8 })
     .withMessage("確認用パスワードは８文字以上である必要があります"),
-  body("username").costom(value => {
+  body("username").custom(value => {
     return User.findOne({ username: value }).then(user => {
       if (user) {
         return Promise.reject("このユーザーはすでに使われています");
@@ -69,7 +69,6 @@ app.post(
 );
 
 //ユーザーログイン用API
-
 app.listen(PORT, () => {
   console.log("ローカルサーバー起動中");
 });
