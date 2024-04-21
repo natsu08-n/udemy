@@ -36,6 +36,32 @@ exports.login = async (req, res) => {
         },
       });
     }
+
+    /*
+     ** パスワードが合っているか照合する
+     */
+
+    //暗号化されたパスワードを複合化
+    const descryptedPassword = CryptoJS.AES.decrypt(
+      user.password,
+      process.env.SECRET_KEY
+    );
+
+    //複合化したパスワードとログイン字入力したパスワードが一致しなければエラー返す
+    if (descryptedPassword !== password) {
+      res.status(401).json({
+        errors: {
+          param: "password",
+          mesage: "パスワードが無効です",
+        },
+      });
+    }
+
+    //パスワード一致していればJWTの発行
+    const token = JWT.sign({ id: user._id }, process.env.TOKEN_SECRET_KEY, {
+      expiresIn: "24h",
+    });
+    return res.status(201).json({ user, token });
   } catch (err) {
     return res.status(500).json(err);
   }
