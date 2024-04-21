@@ -29,7 +29,7 @@ exports.login = async (req, res) => {
     //DBからユーザーが存在するか探してくる
     const user = await User.findOne({ username: username });
     if (!user) {
-      res.status(401).json({
+      return res.status(401).json({
         errors: {
           param: "username",
           mesage: "ユーザー名が無効です",
@@ -45,11 +45,11 @@ exports.login = async (req, res) => {
     const descryptedPassword = CryptoJS.AES.decrypt(
       user.password,
       process.env.SECRET_KEY
-    );
+    ).toString(CryptoJS.enc.Utf8);
 
     //複合化したパスワードとログイン字入力したパスワードが一致しなければエラー返す
     if (descryptedPassword !== password) {
-      res.status(401).json({
+      return res.status(401).json({
         errors: {
           param: "password",
           mesage: "パスワードが無効です",
